@@ -34,7 +34,7 @@ const resolvers = {
             return 12.99
         },
         releaseYear() {
-            return null
+            return 2020
         },
         rating() {
             return 5
@@ -50,6 +50,7 @@ const server = new GraphQLServer({
     resolvers
 })
 
-server.start(() => {
-    console.log(`The server is up!`);
+server.start((e) => {
+    console.log(`wow - The server is up!`, { e });
 })
+
