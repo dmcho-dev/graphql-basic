@@ -2,14 +2,15 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// 15. operation arguments
+// 16. Working with Arrays: Part I
 
 // Type definitions { schema }
 // What are data looks like
 const typeDefs = `
     type Query {
         greeting(name: String, position: String): String!
-        add(a: Float!, b: Float!): Float!
+        add(numbers: [Float!]!): Float!
+        grades: [Int!]!
         me: User!
         post: Post!
     }
@@ -33,7 +34,7 @@ const typeDefs = `
 // functions
 const resolvers = {
     Query: {
-        greeting(parent, args, ctx) {
+        greeting(parent, args, ctx, info) {
             console.log({parent, args, ctx})
             if(args.name && args.position) {
                 return `Hello! ${args.name}! you are my favoriate ${args.position}`
@@ -41,8 +42,18 @@ const resolvers = {
                 return `Hello!`
             }
         },
-        add(parent, args, ctx) {
-            return args.a + args.b
+        add(parent, args, ctx, info) {
+            if(args.numbers.length === 0) {
+                return 0
+            }
+
+            return args.numbers.reduce((accumulater, currentValue) => {
+                return accumulater + currentValue
+            })
+        },
+        grades(parent, args, ctx) {
+            return [99, 80, 93]
+
         },
         me() {
             return {
@@ -89,6 +100,6 @@ const server = new GraphQLServer({
 })
 
 server.start((e) => {
-    console.log(`wow - The server is up!`, { e });
+    console.log(`wow - The server is up!`);
 })
 
