@@ -2,14 +2,14 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// Create Custom Type
-// User
-// Post
+// 15. operation arguments
 
 // Type definitions { schema }
 // What are data looks like
 const typeDefs = `
     type Query {
+        greeting(name: String, position: String): String!
+        add(a: Float!, b: Float!): Float!
         me: User!
         post: Post!
     }
@@ -33,6 +33,17 @@ const typeDefs = `
 // functions
 const resolvers = {
     Query: {
+        greeting(parent, args, ctx) {
+            console.log({parent, args, ctx})
+            if(args.name && args.position) {
+                return `Hello! ${args.name}! you are my favoriate ${args.position}`
+            } else {
+                return `Hello!`
+            }
+        },
+        add(parent, args, ctx) {
+            return args.a + args.b
+        },
         me() {
             return {
                 id: "123123",
