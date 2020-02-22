@@ -2,17 +2,64 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// 16. Working with Arrays: Part I
+// 17. Working with Arrays: Part II
+
+
+/**
+ * 
+1. Set up an array of three posts with dummy post data (id, title, body, published)
+2. Set up a "posts" query and resolver that returns all the posts
+3. Test the query out
+4. Add a "query" argument that only returns posts that contain the query string in the title or body
+5. run a few sample queries searching for posts with a specific title
+
+ */
+
+
+// Demo user data
+const users = [
+    {
+        id: '1',
+        name: 'Dongmin',
+        email: 'dmcho@gmail.com',
+        age: 37,
+    },
+    {
+        id: '2',
+        name: 'Sarah',
+        email: 'sarah@gmail.com',
+        age: 27,
+    },
+]
+
+const posts = [
+    {
+        id: '10',
+        title: "Graphql 101",
+        body: 'title alpha 1',
+        published: true
+    },
+    {
+        id: '20',
+        title: "Graphql 201",
+        body: 'title alpha 2',
+        published: false
+    },
+    {
+        id: '30',
+        title: "Graphql 301",
+        body: 'title alpha 3',
+        published: false
+    },
+]
 
 // Type definitions { schema }
 // What are data looks like
 const typeDefs = `
     type Query {
-        greeting(name: String, position: String): String!
-        add(numbers: [Float!]!): Float!
-        grades: [Int!]!
+        users(query: String): [User!]!
         me: User!
-        post: Post!
+        posts(query: String): [Post!]!
     }
 
     type User {
@@ -34,26 +81,15 @@ const typeDefs = `
 // functions
 const resolvers = {
     Query: {
-        greeting(parent, args, ctx, info) {
-            console.log({parent, args, ctx})
-            if(args.name && args.position) {
-                return `Hello! ${args.name}! you are my favoriate ${args.position}`
-            } else {
-                return `Hello!`
-            }
-        },
-        add(parent, args, ctx, info) {
-            if(args.numbers.length === 0) {
-                return 0
+        users(parent, args, ctx, info) {
+            if(!args.query) {
+                return users
             }
 
-            return args.numbers.reduce((accumulater, currentValue) => {
-                return accumulater + currentValue
+
+            return users.filter((user) => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase())
             })
-        },
-        grades(parent, args, ctx) {
-            return [99, 80, 93]
-
         },
         me() {
             return {
@@ -63,36 +99,26 @@ const resolvers = {
                 age: 29
             }
         },
-        post() {
-            return {
-                id: 'asd123',
-                title: 'title Sample',
-                body: 'body Sample',
-                published: true,
+        posts(parent, args, ctx, info) {
+            if(!args.query) {
+                return posts
             }
+
+            return posts.filter((post) => {
+                const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
+                const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
+                return isTitleMatch || isBodyMatch
+            })
+
+            // const stringCompare = ( target, search ) => target.toLowerCase().includes(search.toLowerCase())
+            // const filterOption = (item, query) => {
+            //     return stringCompare(item.title, query) || stringCompare(item.body, query)
+            // } 
+
+            // return posts.filter((post) => filterOption(post, args.query))
         }
     }
 }
-
-/**
- * Test Code
-```
-query{
-  me {
-    id
-    name
-    email
-    age
-  }
-  post {
-    id
-    title
-    body
-    published
-  }
-}
-```
- */
 
 const server = new GraphQLServer({
     typeDefs,
