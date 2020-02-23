@@ -2,7 +2,7 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// 18. Relational Data: Basics
+// 19. Relational Data: Arrays
 
 
 /**
@@ -22,6 +22,12 @@ const users = [
         id: '2',
         name: 'Sarah',
         email: 'sarah@gmail.com',
+        age: 27,
+    },
+    {
+        id: '3',
+        name: 'Jack',
+        email: 'jack@gmail.com',
         age: 27,
     },
 ]
@@ -64,6 +70,7 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int
+        posts: [Post!]
     }
 
     type Post {
@@ -124,7 +131,17 @@ const resolvers = {
                 return user.id === parent.author
             })
         }
+    },
+    User: {
+        posts(parent, args, ctx, info) {
+            return posts.filter((post) => {
+                return post.author === parent.id
+            })
+        }
+
+
     }
+
 }
 
 
