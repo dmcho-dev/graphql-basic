@@ -2,7 +2,7 @@ import { GraphQLServer } from 'graphql-yoga';
 import uuidv4 from 'uuid/v4'
 import uuid from 'uuid';
 
-// 25. Creating Data with Mutations: Part II
+// 26. The Object Spread Operator with Node.js
 
 
 // Demo user data
@@ -208,17 +208,13 @@ const resolvers = {
 
             const user = {
                 id: uuidv4(),
-                name: args.name,
-                email: args.email,
-                age: args.age
+                ...args
             }
             
             users.push(user)
             return user
         },
         createPost(parent, args, ctx, info) {
-            const { title, body, published, author } = args
-            
             const userExists = users.some(user => user.id === args.author)
             if(!userExists) {
                 throw new Error('User not found')
@@ -226,10 +222,7 @@ const resolvers = {
 
             const post = {
                 id: uuidv4(),
-                title,
-                body,
-                published,
-                author,
+                ...args
             }
             console.log({args, userExists, post})
 
@@ -237,8 +230,6 @@ const resolvers = {
             return post
         },
         createComment(parent, args, ctx, info) {
-            const { text, author, post } = args
-
             const userExists = users.some(user => user.id === args.author)
             const postExists = posts.some(post => post.id === args.post && post.published)
             
@@ -248,9 +239,7 @@ const resolvers = {
 
             const comment = {
                 id: uuidv4(),
-                text,
-                author,
-                post,
+                ...args
             }
 
             comments.push(comment)
