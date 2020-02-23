@@ -2,16 +2,10 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// 17. Working with Arrays: Part II
+// 18. Relational Data: Basics
 
 
 /**
- * 
-1. Set up an array of three posts with dummy post data (id, title, body, published)
-2. Set up a "posts" query and resolver that returns all the posts
-3. Test the query out
-4. Add a "query" argument that only returns posts that contain the query string in the title or body
-5. run a few sample queries searching for posts with a specific title
 
  */
 
@@ -37,19 +31,22 @@ const posts = [
         id: '10',
         title: "Graphql 101",
         body: 'title alpha 1',
-        published: true
+        published: true,
+        author: '1'
     },
     {
         id: '20',
         title: "Graphql 201",
         body: 'title alpha 2',
-        published: false
+        published: false,
+        author: '1'
     },
     {
         id: '30',
         title: "Graphql 301",
         body: 'title alpha 3',
-        published: false
+        published: false,
+        author: '2'
     },
 ]
 
@@ -58,8 +55,8 @@ const posts = [
 const typeDefs = `
     type Query {
         users(query: String): [User!]!
+        posts(query: String, author: String): [Post!]!
         me: User!
-        posts(query: String): [Post!]!
     }
 
     type User {
@@ -74,6 +71,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 `
 
@@ -117,8 +115,18 @@ const resolvers = {
 
             // return posts.filter((post) => filterOption(post, args.query))
         }
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            console.log({parent})
+
+            return users.find(user => {
+                return user.id === parent.author
+            })
+        }
     }
 }
+
 
 const server = new GraphQLServer({
     typeDefs,
