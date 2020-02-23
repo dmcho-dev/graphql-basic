@@ -1,6 +1,6 @@
 import { GraphQLServer } from 'graphql-yoga';
 
-// 21. Comment Challenge: Part II
+// 22. Comment Challenge: Part III
 
 
 // Demo user data
@@ -53,21 +53,25 @@ const comments = [
     {
         id: '102',
         author: '3',
+        post: '10',
         text: "This worked well for me. thanks!"
     },
     {
         id: '103',
         author: '1',
+        post: '10',
         text: "Glad This worked well for me. thanks!"
     },
     {
         id: '104',
         author: '2',
+        post: '20',
         text: "This did no work."
     },
     {
         id: '105',
         author: '1',
+        post: '30',
         text: "wow"
     },
 ]
@@ -98,12 +102,14 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
+        comments: [Comment!]!
     }
 
     type Comment {
         id: ID!
         text: String!
         author: User!
+        post: Post!
     }
 `
 
@@ -152,12 +158,22 @@ const resolvers = {
             return users.find(user => {
                 return user.id === parent.author
             })
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter(comment => {
+                return comment.post === parent.id
+            })
         }
     },
     Comment: {
         author(parent, args, ctx, info) {
             return users.find(user=> {
                 return user.id === parent.author
+            })
+        },
+        post(parent, args, ctx, info) {
+            return posts.find(post => {
+                return post.id === parent.post
             })
         }
     },
