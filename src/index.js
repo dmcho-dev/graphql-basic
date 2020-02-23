@@ -1,7 +1,7 @@
 import { GraphQLServer } from 'graphql-yoga';
 import uuidv4 from 'uuid/v4'
 
-// 28. Deleting Data with Mutations: Part I
+// 29. Deleting Data with Mutations: Part II
 
 
 // Demo user data
@@ -92,7 +92,9 @@ const typeDefs = `
         createUser(data: CreateUserInput!): User!
         deleteUser(id: ID!): User!
         createPost(data: CreatePostInput!): Post!
+        deletePost(id: ID!): Post!
         createComment(data: CreateCommentInput!): Comment!
+        deleteComment(id: ID!): Comment!
 
     }
 
@@ -263,10 +265,21 @@ const resolvers = {
                 id: uuidv4(),
                 ...args.data
             }
-            console.log({args, userExists, post})
 
             posts.push(post)
             return post
+        },
+        deletePost(parent, args, ctx, info) {
+            const postIndex = posts.findIndex(post=> post.id === args.id)
+            if(postIndex === -1) {
+                throw new Error('Post not found')
+            }
+
+            const deletePost = posts.splice(postIndex, 1)
+            
+            comments = comments.filter(comment => comment.post !== args.id)
+
+            return deletePost[0]
         },
         createComment(parent, args, ctx, info) {
             const userExists = users.some(user => user.id === args.data.author)
@@ -283,8 +296,17 @@ const resolvers = {
 
             comments.push(comment)
             return comment
+        },
+        deleteComment(parent, args, ctx, info) {
+            const commentIndex = comments.findIndex(comment=> comment.id === args.id)
+            if(commentIndex === -1) {
+                throw new Error('Comment not found')
+            }
 
-        }
+            const deleteComment = comments.splice(commentIndex, 1)
+
+            return deleteComment[0]
+        },
     }
 
 }
