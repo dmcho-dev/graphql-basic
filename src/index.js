@@ -2,7 +2,7 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar types - String, Boolean, Int, Float, ID
 
-// 19. Relational Data: Arrays
+// 20. Comment Challenge: Part I
 
 
 /**
@@ -13,7 +13,7 @@ import { GraphQLServer } from 'graphql-yoga';
 // Demo user data
 const users = [
     {
-        id: '1',
+        id: '1', 
         name: 'Dongmin',
         email: 'dmcho@gmail.com',
         age: 37,
@@ -56,6 +56,25 @@ const posts = [
     },
 ]
 
+const comments = [
+    {
+        id: '102',
+        text: "This worked well for me. thanks!"
+    },
+    {
+        id: '103',
+        text: "Glad This worked well for me. thanks!"
+    },
+    {
+        id: '104',
+        text: "This did no work."
+    },
+    {
+        id: '105',
+        text: "wow"
+    },
+]
+
 // Type definitions { schema }
 // What are data looks like
 const typeDefs = `
@@ -63,6 +82,7 @@ const typeDefs = `
         users(query: String): [User!]!
         posts(query: String, author: String): [Post!]!
         me: User!
+        comments: [Comment!]!
     }
 
     type User {
@@ -79,6 +99,11 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
+    }
+
+    type Comment {
+        id: ID!
+        text: String!
     }
 `
 
@@ -121,7 +146,11 @@ const resolvers = {
             // } 
 
             // return posts.filter((post) => filterOption(post, args.query))
+        },
+        comments(parent, args, ctx, info) {
+            return comments
         }
+    
     },
     Post: {
         author(parent, args, ctx, info) {
