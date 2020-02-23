@@ -1,7 +1,8 @@
 import { GraphQLServer } from 'graphql-yoga';
 import uuidv4 from 'uuid/v4'
+import uuid from 'uuid';
 
-// 24. Creating Data with Mutations: Part I
+// 25. Creating Data with Mutations: Part II
 
 
 // Demo user data
@@ -90,6 +91,9 @@ const typeDefs = `
 
     type Mutation {
         createUser(name: String!, email: String!, age: Int): User!
+        createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+        createComment(text: String!, author: ID!, post: ID!): Comment!
+
     }
 
     type User {
@@ -211,6 +215,47 @@ const resolvers = {
             
             users.push(user)
             return user
+        },
+        createPost(parent, args, ctx, info) {
+            const { title, body, published, author } = args
+            
+            const userExists = users.some(user => user.id === args.author)
+            if(!userExists) {
+                throw new Error('User not found')
+            }
+
+            const post = {
+                id: uuidv4(),
+                title,
+                body,
+                published,
+                author,
+            }
+            console.log({args, userExists, post})
+
+            posts.push(post)
+            return post
+        },
+        createComment(parent, args, ctx, info) {
+            const { text, author, post } = args
+
+            const userExists = users.some(user => user.id === args.author)
+            const postExists = posts.some(post => post.id === args.post && post.published)
+            
+            if(!userExists || !postExists) {
+                throw new Error('Unable to find user and post')
+            }
+
+            const comment = {
+                id: uuidv4(),
+                text,
+                author,
+                post,
+            }
+
+            comments.push(comment)
+            return comment
+
         }
     }
 
