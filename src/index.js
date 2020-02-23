@@ -1,6 +1,7 @@
 import { GraphQLServer } from 'graphql-yoga';
+import uuidv4 from 'uuid/v4'
 
-// 22. Comment Challenge: Part III
+// 24. Creating Data with Mutations: Part I
 
 
 // Demo user data
@@ -84,6 +85,10 @@ const typeDefs = `
         posts(query: String, author: String): [Post!]!
         me: User!
         comments: [Comment!]!
+    }
+
+    type Mutation {
+        createUser(name: String!, email: String!, age: Int): User!
     }
 
     type User {
@@ -188,8 +193,24 @@ const resolvers = {
                 return comment.author === parent.id
             })
         }
+    },
+    Mutation: {
+        createUser(parent, args, ctx, info) {
+            const emailTaken = users.some(user => user.email === args.email)
+            if(emailTaken) {
+                throw new Error('Email taken.')
+            }
 
-
+            const user = {
+                id: uuidv4(),
+                name: args.name,
+                email: args.email,
+                age: args.age
+            }
+            
+            users.push(user)
+            return user
+        }
     }
 
 }
